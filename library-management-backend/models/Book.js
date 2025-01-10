@@ -9,4 +9,24 @@ const BookSchema = new mongoose.Schema({
   // assignedTo: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
 });
 
+BookSchema.post("save", async function (book) {
+  try {
+    const Author = mongoose.model("Author");
+    const author = await Author.findById(book.author);
+
+    if (author) {
+      await Author.findByIdAndUpdate(
+        book.author,
+        { $addToSet: { books: book._id } },
+        { new: true }
+      );
+      console.log("Book is added to author", book);
+    } else {
+      console.error("Author not found");
+    }
+  } catch (err) {
+    console.error("Error here", err.message);
+  }
+});
+
 module.exports = mongoose.model("Book", BookSchema);
