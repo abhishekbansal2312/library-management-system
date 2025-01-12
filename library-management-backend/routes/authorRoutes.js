@@ -7,13 +7,14 @@ const {
   createAuthor,
   deleteAuthor,
 } = require("../controllers/authorController");
+const { verifyToken, verifyAdmin } = require("../middlewares/authMiddleware");
 
 router.get("/", getAuthors);
 
-router.post("/", createAuthor);
+router.post("/", verifyToken, verifyAdmin, createAuthor);
 
 router.get("/:id", getAuthorById);
 
-router.delete("/:id", deleteAuthor);
+router.delete("/:id", verifyToken, verifyAdmin, deleteAuthor);
 
 module.exports = router;

@@ -3,7 +3,9 @@ const Book = require("../models/Book");
 const BorrowedBook = require("../models/BorrowBook");
 const getUsers = async (req, res) => {
   try {
-    const users = await User.find().populate("borrowedBooks borrowedHistroy");
+    const users = await User.find()
+      .populate("borrowedBooks borrowedHistroy")
+      .select("-password");
     if (!users || users.length === 0) {
       return res.status(404).json({ message: "No users found" });
     }
@@ -15,9 +17,9 @@ const getUsers = async (req, res) => {
 
 const getUserById = async (req, res) => {
   try {
-    const user = await User.findById(req.params.id).populate(
-      "borrowedBooks borrowedHistroy"
-    );
+    const user = await User.findById(req.params.id)
+      .populate("borrowedBooks borrowedHistroy")
+      .select("-password");
     if (!user) {
       return res.status(404).json({ message: "User not found" });
     }

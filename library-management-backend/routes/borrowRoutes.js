@@ -1,8 +1,14 @@
 const express = require("express");
 const router = express.Router();
 
-const { getBorrowRecords } = require("../controllers/borrowController");
+const {
+  getBorrowRecords,
+  getUserBorrowedBooks,
+} = require("../controllers/borrowController");
+const { verifyAdmin, verifyToken } = require("../middlewares/authMiddleware");
 
-router.get("/", getBorrowRecords);
+router.get("/", verifyToken, verifyAdmin, getBorrowRecords);
+
+router.get("/:userId/borrowedBooks", verifyToken, getUserBorrowedBooks);
 
 module.exports = router;

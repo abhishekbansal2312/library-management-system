@@ -7,14 +7,14 @@ const {
   getBookById,
   deleteBook,
 } = require("../controllers/bookController");
-const { verifyToken } = require("../middlewares/authMiddleware");
+const { verifyToken, verifyAdmin } = require("../middlewares/authMiddleware");
 
 router.get("/", verifyToken, getBooks);
 
-router.post("/", insertBook);
+router.post("/", verifyToken, verifyAdmin, insertBook);
 
-router.get("/:id", getBookById);
+router.get("/:id", verifyToken, getBookById);
 
-router.delete("/:id", deleteBook);
+router.delete("/:id", verifyToken, verifyAdmin, deleteBook);
 
 module.exports = router;

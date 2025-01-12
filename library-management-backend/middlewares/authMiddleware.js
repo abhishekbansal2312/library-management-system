@@ -37,6 +37,8 @@ const authorizeBorrowReturn = (req, res, next) => {
 
 const verifyAdmin = (req, res, next) => {
   const { role } = req.userInfo;
+  console.log(req.userInfo);
+
   if (role === "admin") {
     return next();
   }

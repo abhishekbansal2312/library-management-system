@@ -16,10 +16,10 @@ const {
 
 router.get("/", getUsers);
 
-router.get("/:id", getUserById);
+router.get("/:id", verifyToken, getUserById);
 router.post("/", createUser);
 router.delete("/:id", deleteUser);
 router.put("/:id/borrow", verifyToken, authorizeBorrowReturn, borrowBook);
-router.put("/:id/return", returnBook);
+router.put("/:id/return", verifyToken, authorizeBorrowReturn, returnBook);
 
 module.exports = router;
