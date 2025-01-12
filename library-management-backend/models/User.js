@@ -8,6 +8,14 @@ const UserSchema = new mongoose.Schema({
     lowercase: true,
     unique: true,
   },
+  role: {
+    type: String,
+    required: true,
+    trim: true,
+    lowercase: true,
+    default: "user",
+    enum: ["user", "admin"],
+  },
 
   email: { type: String, required: true, unique: true },
   password: { type: String, required: true, trim: true },

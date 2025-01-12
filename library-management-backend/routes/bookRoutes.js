@@ -7,9 +7,9 @@ const {
   getBookById,
   deleteBook,
 } = require("../controllers/bookController");
-const authMiddleware = require("../middlewares/authMiddleware");
+const { verifyToken } = require("../middlewares/authMiddleware");
 
-router.get("/", authMiddleware, getBooks);
+router.get("/", verifyToken, getBooks);
 
 router.post("/", insertBook);
 

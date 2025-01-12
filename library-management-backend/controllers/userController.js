@@ -66,31 +66,22 @@ const borrowBook = async (req, res) => {
     const { bookId } = req.body;
 
     if (!bookId) {
-      return res.status(400).json({ message: "Please provide bookId" }); // book id is required
+      return res.status(400).json({ message: "Please provide bookId" });
     }
 
     const user = await User.findById(id);
     if (!user) {
-      return res.status(404).json({ message: "User not found" }); // user id is required
+      return res.status(404).json({ message: "User not found" });
     }
 
-    const book = await Book.findById(bookId); // find book id
+    const book = await Book.findById(bookId);
     if (!book) {
-      return res.status(404).json({ message: "Book not found" }); // book id is required
+      return res.status(404).json({ message: "Book not found" });
     }
-    if (user.borrowedBooks.includes(bookId)) {
-      return res.status(400).json({ message: "Book already borrowed" }); // book is already borrowed
-    }
-    const prevborrowedBook = await BorrowedBook.findOne({
-      // find previous borrowed book
-      user: id,
-      book: bookId,
-    });
-    console.log();
 
-    if (!prevborrowedBook.returnDate) {
+    if (book.isBorrowed) {
       return res.status(400).json({
-        message: "Book is already borrowed previously and not returned",
+        message: "Book is already borrowed by another user",
       });
     }
 
@@ -99,71 +90,67 @@ const borrowBook = async (req, res) => {
       book: bookId,
     });
 
+    // Update book status and save
+    book.isBorrowed = true;
+    book.borrowedBy = id;
+    await book.save();
+
+    // Update user history
+    user.borrowedBooks.push(bookId);
     user.borrowedHistroy.push(borrowedBook);
     await borrowedBook.save();
-
-    user.borrowedBooks.push(bookId);
-
     await user.save();
+
     res.json({ message: "Book borrowed successfully", borrowedBook });
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
 };
-
 const returnBook = async (req, res) => {
   try {
     const { id } = req.params; // User ID
     const { bookId } = req.body; // Book ID
 
-    // Validate request body
     if (!bookId) {
       return res.status(400).json({ message: "Please provide bookId" });
     }
 
-    // Fetch user by ID
     const user = await User.findById(id);
     if (!user) {
       return res.status(404).json({ message: "User not found" });
     }
 
-    // Fetch book by ID
     const book = await Book.findById(bookId);
     if (!book) {
       return res.status(404).json({ message: "Book not found" });
     }
 
-    // Check if the book is in the user's borrowed list
-    if (!user.borrowedBooks.includes(bookId)) {
-      return res
-        .status(400)
-        .json({ message: "This book was not borrowed by the user" });
+    if (!book.isBorrowed || book.borrowedBy.toString() !== id) {
+      return res.status(400).json({
+        message: "This book is not borrowed by the user",
+      });
     }
 
-    // Fetch the borrowed book record
     const borrowedBook = await BorrowedBook.findOne({
-      user: id,
       book: bookId,
-      returnDate: null,
     });
     if (!borrowedBook) {
-      return res
-        .status(400)
-        .json({ message: "Borrowed book record not found" });
-    }
-
-    // Check if the book has already been returned
-    if (borrowedBook.returnDate) {
-      return res
-        .status(400)
-        .json({ message: "Book has already been returned" });
+      return res.status(400).json({
+        message: "Borrowed book record not found",
+      });
     }
 
     borrowedBook.returnDate = Date.now();
-    await borrowedBook.save(); // Save the updated borrowed book record
+    await borrowedBook.save();
 
-    user.borrowedBooks.pull(bookId); // Remove book from user's borrowed list
-    await user.save(); // Save updated user record
+    // Reset book status and save
+    book.isBorrowed = false;
+    book.borrowedBy = null;
+    await book.save();
+
+    // Remove the book from the user's borrowed list
+    user.borrowedBooks.pull(bookId);
+    await user.save();
 
     res.json({ message: "Book returned successfully", borrowedBook });
   } catch (error) {

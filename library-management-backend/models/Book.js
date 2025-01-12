@@ -6,7 +6,8 @@ const BookSchema = new mongoose.Schema({
   publishedDate: { type: Date },
   genre: { type: String },
   price: { type: Number, required: true, min: 0 },
-  // assignedTo: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
+  isBorrowed: { type: Boolean, default: false },
+  borrowedBy: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
 });
 
 BookSchema.post("save", async function (book) {

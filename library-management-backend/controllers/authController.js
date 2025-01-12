@@ -3,19 +3,20 @@ const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 
 const generateToken = (user, secret, expiresIn) => {
-  return jwt.sign({ userId: user._id }, secret, { expiresIn });
+  const userInfo = { userId: user._id, role: user.role };
+  return jwt.sign(userInfo, secret, { expiresIn });
 };
 
 const register = async (req, res) => {
   try {
-    const { name, email, password } = req.body;
+    const { name, email, password, role } = req.body;
     if (!name || !email || !password || password.length < 8) {
       return res.status(400).json({ message: "Invalid input" });
     }
     const salt = await bcrypt.genSalt(10);
 
     const hashedPassword = await bcrypt.hash(password, salt);
-    const user = new User({ name, email, password: hashedPassword });
+    const user = new User({ name, email, password: hashedPassword, role });
     await user.save();
     res.status(201).json({ message: "User created successfully", user });
   } catch (error) {
