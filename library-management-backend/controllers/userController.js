@@ -86,6 +86,8 @@ const borrowBook = async (req, res) => {
       user: id,
       book: bookId,
     });
+    console.log();
+
     if (!prevborrowedBook.returnDate) {
       return res.status(400).json({
         message: "Book is already borrowed previously and not returned",

@@ -53,7 +53,7 @@ const getAuthorById = async (req, res) => {
 const deleteAuthor = async (req, res) => {
   try {
     const id = req.params.id;
-    const deletedAuthor = await Book.findByIdAndDelete(id);
+    const deleteAuthor = await Author.findByIdAndDelete(id);
     if (!deleteAuthor) {
       return res.status(404).json({ message: "Author not found" });
     }

@@ -11,6 +11,10 @@ const BookSchema = new mongoose.Schema({
 
 BookSchema.post("save", async function (book) {
   try {
+    // if (!this.isModified("author")) {
+    //   console.log("Author field not modified, exiting...");
+    //   return; // Exit early if the author field was not modified
+    // }
     const Author = mongoose.model("Author");
     const author = await Author.findById(book.author);
 
