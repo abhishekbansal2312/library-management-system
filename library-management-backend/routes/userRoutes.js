@@ -12,13 +12,14 @@ const {
 const {
   verifyToken,
   authorizeBorrowReturn,
+  verifyAdmin,
 } = require("../middlewares/authMiddleware");
 
 router.get("/", getUsers);
 
 router.get("/:id", verifyToken, getUserById);
-router.post("/", createUser);
-router.delete("/:id", deleteUser);
+router.post("/", verifyToken, verifyAdmin, createUser);
+router.delete("/:id", verifyToken, verifyAdmin, deleteUser);
 router.put("/:id/borrow", verifyToken, authorizeBorrowReturn, borrowBook);
 router.put("/:id/return", verifyToken, authorizeBorrowReturn, returnBook);
 

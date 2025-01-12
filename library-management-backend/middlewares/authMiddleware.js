@@ -42,7 +42,6 @@ const verifyAdmin = (req, res, next) => {
   if (role === "admin") {
     return next();
   }
-
   return res.status(403).json({ message: "Access denied. Admins only." });
 };
 
